@@ -1,0 +1,9 @@
+# Ignorar dependencias
+backend/vendor/
+node_modules/
+
+# Ignorar base de datos local
+db_data/
+
+# Ignorar variables de entorno (claves secretas)
+backend/.env
