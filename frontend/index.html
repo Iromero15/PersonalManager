@@ -1,1 +1,272 @@
-<h1>¡Angular va a ir aca! Nginx esta vivo.</h1>
+<!DOCTYPE html>
+<html lang="es" ng-app="ExpenseApp">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>MVP - Gestor de Gastos</title>
+
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet">
+    <link href="assets/css/sb-admin-2.min.css" rel="stylesheet">
+</head>
+
+<body id="page-top" ng-controller="DashboardController">
+
+    <div id="wrapper">
+
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Gastos v1.0</div>
+            </a>
+            <hr class="sidebar-divider my-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider d-none d-md-block">
+        </ul>
+
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Ignacio</span>
+                                <img class="img-profile rounded-circle" src="assets/img/undraw_profile.svg">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="container-fluid">
+                    
+                    <h1 class="h3 mb-4 text-gray-800">{{ titulo }}</h1>
+
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Balance Total</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ resumen.balance }}</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Ingresos</div>
+                                            <div class="h5 mb-0 font-weight-bold text-success">+${{ resumen.ingresos }}</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-arrow-up fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Gastos</div>
+                                            <div class="h5 mb-0 font-weight-bold text-danger">-${{ resumen.gastos }}</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-arrow-down fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary">Cargar Movimiento</h6>
+                        </div>
+                        <div class="card-body">
+                            <form ng-submit="agregarTransaccion()">
+                                <div class="form-row">
+                                    <div class="col-md-3 mb-3">
+                                        <label>Descripción</label>
+                                        <input type="text" class="form-control" ng-model="nuevaTransaccion.description" required>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>Monto</label>
+                                        <input type="number" step="0.01" class="form-control" ng-model="nuevaTransaccion.amount" required>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>Tipo</label>
+                                        <select class="form-control" ng-model="nuevaTransaccion.type">
+                                            <option value="expense">Gasto</option>
+                                            <option value="income">Ingreso</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label>Categoría</label>
+                                        <select class="form-control" ng-model="nuevaTransaccion.category_id" 
+                                                ng-options="cat.id as cat.name for cat in categorias">
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-primary btn-block">Guardar</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <hr>
+
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Nueva Categoría" ng-model="nuevaCategoriaNombre">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-secondary btn-sm" type="button" ng-click="agregarCategoria()">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="d-flex flex-wrap">
+                                        <span ng-repeat="cat in categorias" class="badge badge-light border p-2 m-1">
+                                            {{ cat.name }} 
+                                            <i class="fas fa-times text-danger ml-1" style="cursor:pointer" ng-click="eliminarCategoria(cat.id)"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Historial de Movimientos</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Categoría</th>
+                                            <th>Descripción</th>
+                                            <th>Monto</th>
+                                            <th class="text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="tx in transacciones | orderBy:'-transaction_date'">
+                                            <td>{{ tx.transaction_date }}</td>
+                                            <td><span class="badge badge-info">{{ tx.category_name || 'Sin Categoría' }}</span></td>
+                                            <td>{{ tx.description }}</td>
+                                            <td ng-class="{'text-danger': tx.type === 'expense', 'text-success': tx.type === 'income'}">
+                                                {{ tx.type === 'expense' ? '-' : '+' }} ${{ tx.amount }}
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-info btn-sm" ng-click="prepararEdicion(tx)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" ng-click="eliminarTransaccion(tx.id)">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>MVP Gastos Personales &copy; 2026</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <div class="modal fade" id="modalEdicion" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Movimiento</h5>
+                    <button class="close" type="button" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <form ng-submit="guardarEdicion()">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <input type="text" class="form-control" ng-model="editando.description" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto</label>
+                            <input type="number" step="0.01" class="form-control" ng-model="editando.amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select class="form-control" ng-model="editando.category_id" 
+                                    ng-options="cat.id as cat.name for cat in categorias">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                        <button class="btn btn-success" type="submit">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="assets/js/sb-admin-2.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="app/app.module.js"></script>
+    <script src="app/dashboard.controller.js"></script>
+
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">¿Cerrar sesión?</h5>
+                    <button class="close" type="button" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">Al salir vas a tener que loguearte de nuevo.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" ng-click="logout()" data-dismiss="modal">Salir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
